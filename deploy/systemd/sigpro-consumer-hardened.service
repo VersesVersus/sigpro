@@ -1,0 +1,31 @@
+[Unit]
+Description=SigPro Signal Event Consumer (Hardened)
+After=network-online.target signal-inbound-collector-hardened.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=james
+Group=james
+WorkingDirectory=/home/james/.openclaw/workspace-sigpro
+EnvironmentFile=-/home/james/.openclaw/workspace-sigpro/deploy/systemd/sigpro.env
+ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_event_consumer_sigpro.py --consumer sigpro-main --limit 200
+TimeoutStartSec=180
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=0077
+ReadWritePaths=/home/james/.openclaw/workspace-sigpro/.openclaw /home/james/.local/share/signal-cli/attachments

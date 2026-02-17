@@ -1,0 +1,39 @@
+[Unit]
+Description=SigPro Signal Inbound Collector (Hardened)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=james
+Group=james
+WorkingDirectory=/home/james/.openclaw/workspace-sigpro
+EnvironmentFile=-/home/james/.openclaw/workspace-sigpro/deploy/systemd/sigpro.env
+ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_inbound_collector.py --follow --poll-ms 1500
+Restart=always
+RestartSec=2
+TimeoutStopSec=15
+KillMode=process
+NoNewPrivileges=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectSystem=strict
+ProtectHome=read-only
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+ProtectClock=true
+ProtectHostname=true
+MemoryDenyWriteExecute=true
+LockPersonality=true
+RestrictSUIDSGID=true
+RestrictRealtime=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+UMask=0077
+ReadWritePaths=/home/james/.openclaw/workspace-sigpro/.openclaw /home/james/.local/share/signal-cli/attachments
+StateDirectory=
+RuntimeDirectory=
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,16 @@
+[Unit]
+Description=SigPro Signal Event Consumer (SQLite -> SigPro workflow)
+After=network-online.target signal-inbound-collector.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=james
+Group=james
+WorkingDirectory=/home/james/.openclaw/workspace-sigpro
+ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_event_consumer_sigpro.py --consumer sigpro-main --limit 200
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=/home/james/.openclaw/workspace-sigpro/.openclaw /home/james/.local/share/signal-cli/attachments
