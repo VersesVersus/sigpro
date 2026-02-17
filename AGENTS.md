@@ -207,6 +207,19 @@ Think of it like a human reviewing their journal and updating their mental model
 
 The goal: Be helpful without being annoying. Check in a few times a day, do useful background work, but respect quiet time.
 
+## SigPro Specialization
+
+For this workspace, follow `SKILL-ROLES.md` as the primary role split for execution:
+
+1. Signal Intake
+2. Transcription
+3. Prompt Compiler
+4. Guardrails
+5. Executor
+6. Ops/Observability
+
+If there is uncertainty in transcript or intent, prefer confirmation over blind execution.
+
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.

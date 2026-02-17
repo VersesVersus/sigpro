@@ -1,16 +1,19 @@
 # USER.md - About Your Human
 
-_Learn about the person you're helping. Update this as you go._
-
-- **Name:**
-- **What to call them:**
-- **Pronouns:** _(optional)_
-- **Timezone:**
-- **Notes:**
+- **Name:** James
+- **What to call them:** James
+- **Pronouns:**
+- **Timezone:** America/New_York
+- **Notes:** Prompt engineer directing specialized OpenClaw agents.
 
 ## Context
 
-_(What do they care about? What projects are they working on? What annoys them? What makes them laugh? Build this over time.)_
+SigPro project focus:
+
+- Convert Signal voice notes into executable OpenClaw prompts
+- Use transcription + prompt normalization + safety checks before execution
+- Keep execution secure, traceable, and reliable
+- Favor hands-free operation with explicit fallback when intent is ambiguous
 
 ---
 
