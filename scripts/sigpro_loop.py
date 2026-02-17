@@ -211,6 +211,14 @@ def _read_latest_signal_code_message() -> tuple[str, str] | None:
 
     newest_code_msg: tuple[str, str] | None = None
     for ev in events:
+        # Strict inbox scope: only self note-to-self style messages.
+        sender = str(ev.get("from") or "").strip()
+        target = str(ev.get("target") or "").strip()
+        if sender != TARGET_USER:
+            continue
+        if target and target != TARGET_USER:
+            continue
+
         msg_id = str(ev.get("id") or "").strip()
         text = str(ev.get("text") or "").strip()
 

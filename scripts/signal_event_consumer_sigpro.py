@@ -245,8 +245,9 @@ def handle_code_event(row) -> None:
 
 def is_from_target_sender(row) -> bool:
     sender = json.loads(row["sender_json"])
-    sid = str(sender.get("id") or "")
-    return sid == TARGET_USER or not sid
+    sid = str(sender.get("id") or "").strip()
+    # Strict scope: only process messages where sender is the configured self user.
+    return sid == TARGET_USER
 
 
 def main() -> int:
