@@ -105,6 +105,10 @@ def _find_newest_unprocessed_attachment() -> Path | None:
         if p.name == last_name:
             seen_last = True
 
+    # If we found the last processed file and nothing newer exists, nothing to do.
+    if seen_last:
+        return None
+
     # If state points to deleted/unknown file, process only newest to avoid replay storms.
     return files[-1]
 
