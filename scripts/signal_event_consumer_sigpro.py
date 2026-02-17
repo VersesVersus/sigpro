@@ -246,8 +246,21 @@ def handle_code_event(row) -> None:
 def is_from_target_sender(row) -> bool:
     sender = json.loads(row["sender_json"])
     sid = str(sender.get("id") or "").strip()
-    # Strict scope: only process messages where sender is the configured self user.
-    return sid == TARGET_USER
+    if sid == TARGET_USER:
+        return True
+
+    # Journald parsing can occasionally emit text rows without sender id.
+    # To avoid processing random inbox traffic, only allow these when:
+    # - there is an active pending request, and
+    # - the text is exactly #### (auth code format).
+    if not sid:
+        if not PENDING_FILE.exists():
+            return False
+        msg = json.loads(row["message_json"])
+        text = str(msg.get("text") or "").strip()
+        return bool(CODE_RE.match(text))
+
+    return False
 
 
 def main() -> int:
