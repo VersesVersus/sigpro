@@ -223,3 +223,11 @@ If there is uncertainty in transcript or intent, prefer confirmation over blind 
 ## Make It Yours
 
 This is a starting point. Add your own conventions, style, and rules as you figure out what works.
+
+## Model Routing Policy (Trivial-first)
+
+- Default planning/review model: `openai-codex/gpt-5.3-codex`.
+- Trivial coding work should be delegated first to **roles/JUNIOR_PROGRAMMER.md** using local `ollama-coder`.
+- Any draft from Junior Programmer must be reviewed by `gpt-5.3-codex` before commit.
+- Commits to GitHub should include senior review corrections/improvements, not raw junior output.
+- Reserve Opus for explicitly requested heavy tasks only.
