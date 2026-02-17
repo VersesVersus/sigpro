@@ -1,1 +1,7 @@
 .openclaw/
+.env
+.tmp/
+logs/
+.state/
+__pycache__/
+*.pyc
