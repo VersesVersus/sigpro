@@ -6,7 +6,6 @@ Wants=network-online.target
 [Service]
 Type=oneshot
 User=james
-Group=james
 WorkingDirectory=/home/james/.openclaw/workspace-sigpro
 EnvironmentFile=-/home/james/.openclaw/workspace-sigpro/deploy/systemd/sigpro.env
 ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_event_consumer_sigpro.py --consumer sigpro-main --limit 200

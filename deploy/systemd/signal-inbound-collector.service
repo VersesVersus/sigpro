@@ -5,8 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=james
-Group=james
+# User inherited from systemd --user manager
 WorkingDirectory=/home/james/.openclaw/workspace-sigpro
 ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_inbound_collector.py --follow --poll-ms 1500
 Restart=always
@@ -18,4 +17,4 @@ ProtectHome=false
 ReadWritePaths=/home/james/.openclaw/workspace-sigpro/.openclaw /home/james/.local/share/signal-cli/attachments
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target

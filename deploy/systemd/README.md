@@ -1,6 +1,7 @@
 # Systemd Units for SigPro JSONL Phase-1
 
 These units run:
+- `signal-journal-bridge.timer` + `signal-journal-bridge.service` (journald -> raw JSONL ingress)
 - `signal-inbound-collector.service` (continuous JSONL -> SQLite collector)
 - `sigpro-consumer.timer` + `sigpro-consumer.service` (periodic SigPro consumer)
 
@@ -19,6 +20,7 @@ cp /home/james/.openclaw/workspace-sigpro/deploy/systemd/*.timer ~/.config/syste
 systemctl --user daemon-reload
 
 # Standard profile
+systemctl --user enable --now signal-journal-bridge.timer
 systemctl --user enable --now signal-inbound-collector.service
 systemctl --user enable --now sigpro-consumer.timer
 

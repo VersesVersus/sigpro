@@ -5,8 +5,7 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-User=james
-Group=james
+# User inherited from systemd --user manager
 WorkingDirectory=/home/james/.openclaw/workspace-sigpro
 ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_event_consumer_sigpro.py --consumer sigpro-main --limit 200
 NoNewPrivileges=true

@@ -1,0 +1,15 @@
+[Unit]
+Description=Signal journald -> JSONL ingress bridge (SigPro)
+After=signal-cli-daemon.service
+Wants=signal-cli-daemon.service
+
+[Service]
+Type=oneshot
+# User inherited from systemd --user manager
+WorkingDirectory=/home/james/.openclaw/workspace-sigpro
+ExecStart=/usr/bin/env python3 /home/james/.openclaw/workspace-sigpro/scripts/signal_journal_to_jsonl.py --limit 400
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=full
+ProtectHome=false
+ReadWritePaths=/home/james/.openclaw/workspace-sigpro/.openclaw
