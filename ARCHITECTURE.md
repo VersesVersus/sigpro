@@ -2,8 +2,10 @@
 
 ## Pipeline
 
-1. **Signal Ingress**
-   - Receive inbound voice note and metadata
+1. **Signal Ingress (via OpenClaw + shared dispatcher)**
+   - OpenClaw receives inbound Signal messages
+   - Main/session router publishes events to shared dispatcher bus
+   - SigPro consumes new events by consumer cursor (no direct `signal-cli receive`)
 2. **Audio Transcription**
    - Use ElevenLabs to convert audio -> text
 3. **Prompt Normalization**
