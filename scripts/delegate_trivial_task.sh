@@ -4,7 +4,7 @@ set -euo pipefail
 usage() {
   cat <<USAGE
 Usage:
-  scripts/delegate_trivial_task.sh --task "<short task>" [--checks "<cmd>"] [--run-checks]
+  scripts/delegate_trivial_task.sh --task "<short task>" [--checks "<cmd>"] [--run-checks] [--autocommit] [--commit-type "feat|fix|chore|refactor"]
 
 Purpose:
   Create a repeatable two-pass delegation bundle:
@@ -17,12 +17,18 @@ Outputs:
     02_senior_review_prompt.md
     03_validation.sh
     RUN.md
+
+When --autocommit is set:
+  - Stages all changes
+  - Commits using template with senior-review note
 USAGE
 }
 
 TASK=""
 CHECKS=""
 RUN_CHECKS=0
+AUTOCOMMIT=0
+COMMIT_TYPE="chore"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -37,6 +43,14 @@ while [[ $# -gt 0 ]]; do
     --run-checks)
       RUN_CHECKS=1
       shift
+      ;;
+    --autocommit)
+      AUTOCOMMIT=1
+      shift
+      ;;
+    --commit-type)
+      COMMIT_TYPE="${2:-chore}"
+      shift 2
       ;;
     -h|--help)
       usage
@@ -127,17 +141,14 @@ cat > "$OUTDIR/RUN.md" <<RUN
 # Delegation Runbook
 
 1) Junior pass (local ollama-coder)
-- Use prompt file: \
-  \
+- Use prompt file:
   $OUTDIR/01_junior_prompt.md
 
 2) Senior pass (remote gpt-5.3-codex)
-- Use prompt file: \
-  \
+- Use prompt file:
   $OUTDIR/02_senior_review_prompt.md
 
 3) Validation
-\
 $OUTDIR/03_validation.sh
 
 4) Commit
@@ -146,6 +157,24 @@ RUN
 
 if [[ "$RUN_CHECKS" -eq 1 ]]; then
   "$OUTDIR/03_validation.sh"
+fi
+
+if [[ "$AUTOCOMMIT" -eq 1 ]]; then
+  if [[ -z "$(git status --porcelain)" ]]; then
+    echo "No changes to commit. Skipping --autocommit."
+  else
+    git add -A
+    COMMIT_MSG_FILE="$OUTDIR/commit_message.txt"
+    cat > "$COMMIT_MSG_FILE" <<MSG
+${COMMIT_TYPE}: ${TASK}
+
+Reviewed and corrected by gpt-5.3-codex.
+
+Co-authored-by: Junior Programmer (ollama-coder)
+MSG
+    git commit -F "$COMMIT_MSG_FILE"
+    echo "Autocommit complete."
+  fi
 fi
 
 echo "Created delegation bundle: $OUTDIR"

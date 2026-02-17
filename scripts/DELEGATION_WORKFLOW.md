@@ -16,6 +16,23 @@ scripts/delegate_trivial_task.sh \
   --checks "npm test && npm run build"
 ```
 
+## Autocommit example
+
+```bash
+scripts/delegate_trivial_task.sh \
+  --task "clean up navbar spacing" \
+  --checks "npm run build" \
+  --run-checks \
+  --autocommit \
+  --commit-type "refactor"
+```
+
+Autocommit message template:
+- Subject: `<type>: <task>`
+- Body includes:
+  - `Reviewed and corrected by gpt-5.3-codex.`
+  - `Co-authored-by: Junior Programmer (ollama-coder)`
+
 ## What it creates
 
 `.openclaw/delegation/<timestamp>/`
