@@ -14,6 +14,7 @@ import re
 import subprocess
 import time
 from pathlib import Path
+from typing import Any
 
 from signal_event_store import DEFAULT_DB, fetch_events, get_conn, get_offset, init_db, set_offset
 
@@ -93,22 +94,70 @@ def _validate_code(code: str) -> tuple[bool, str]:
     return bool(payload.get("ok")), str(payload.get("message") or "Invalid code.")
 
 
+def _extract_text_candidates(obj: Any) -> list[str]:
+    out: list[str] = []
+
+    def walk(v: Any) -> None:
+        if isinstance(v, dict):
+            for k in ("final", "reply", "text", "message", "content", "output"):
+                val = v.get(k)
+                if isinstance(val, str) and val.strip():
+                    out.append(val.strip())
+            for _, child in v.items():
+                walk(child)
+        elif isinstance(v, list):
+            for item in v:
+                walk(item)
+
+    walk(obj)
+    # preserve order, remove duplicates
+    dedup: list[str] = []
+    seen: set[str] = set()
+    for s in out:
+        if s not in seen:
+            seen.add(s)
+            dedup.append(s)
+    return dedup
+
+
+def _best_assistant_text(payload: dict[str, Any]) -> str:
+    # Prefer top-level canonical fields first.
+    for k in ("final", "reply", "text", "message"):
+        v = payload.get(k)
+        if isinstance(v, str) and v.strip():
+            return v.strip()
+
+    # Then scan nested payload for any textual content.
+    candidates = _extract_text_candidates(payload)
+    for c in candidates:
+        if c.lower() not in {"execution completed.", "execution completed"}:
+            return c
+
+    return candidates[0] if candidates else ""
+
+
 def _execute_in_main(transcript: str) -> str:
     text = f"SigPro Authorized Signal Voice Request:\n{transcript}"
     proc = _run([
-        "openclaw", "sessions", "send",
-        "--session-key", "agent:main:main",
+        "openclaw", "agent",
+        "--agent", "main",
         "--message", text,
-        "--timeout-seconds", "120",
         "--json",
+        "--timeout", "120",
     ])
     if proc.returncode != 0:
-        return "Execution triggered, but final response was unavailable."
+        return "Execution was triggered, but no assistant output was returned."
+
     try:
         payload = json.loads(proc.stdout)
     except json.JSONDecodeError:
-        return "Execution completed."
-    return str(payload.get("final") or payload.get("reply") or payload.get("text") or "Execution completed.")[:700]
+        return "Execution completed, but assistant output could not be parsed."
+
+    assistant_text = _best_assistant_text(payload)
+    if not assistant_text:
+        return "Execution completed, but no assistant text was returned."
+
+    return assistant_text[:3000]
 
 
 def _store_pending_transcript(transcript: str, source_file: str, source_message_id: str | None) -> None:
@@ -185,7 +234,12 @@ def handle_code_event(row) -> None:
         return
 
     summary = _execute_in_main(transcript)
-    _send_message("signal", TARGET_USER, f"Authorized and executed. Summary: {summary}")
+    formatted = (
+        "✅ SigPro request authorized and executed\n\n"
+        f"🗣️ Request:\n{transcript[:500]}\n\n"
+        f"🤖 Assistant Output:\n{summary}"
+    )
+    _send_message("signal", TARGET_USER, formatted[:3500])
     PENDING_FILE.unlink(missing_ok=True)
 
 
