@@ -30,7 +30,8 @@ AUTH_SCRIPT = Path("/home/james/.openclaw/workspace-sigpro/scripts/auth_manager.
 DISPATCHER_SCRIPT = Path("/home/james/.openclaw/workspace/shared/signal_dispatcher.py")
 
 TARGET_USER = "+19412907826"
-CODE_RE = re.compile(r"^\s*(\d{4})\s*$")
+# Strict reply-code format: exactly 4 digits, nothing else.
+CODE_RE = re.compile(r"^([0-9]{4})$")
 
 
 def _ensure_state_dir() -> None:
@@ -211,7 +212,9 @@ def _read_latest_signal_code_message() -> tuple[str, str] | None:
     newest_code_msg: tuple[str, str] | None = None
     for ev in events:
         msg_id = str(ev.get("id") or "").strip()
-        text = str(ev.get("text") or "")
+        text = str(ev.get("text") or "").strip()
+
+        # Ignore anything that is not exactly ####.
         match = CODE_RE.match(text)
         if match and msg_id:
             newest_code_msg = (msg_id, match.group(1))
